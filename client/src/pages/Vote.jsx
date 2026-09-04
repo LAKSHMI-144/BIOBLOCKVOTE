@@ -12,14 +12,55 @@ function Vote() {
   const [authStatus, setAuthStatus] = useState('AI authentication integration pending.')
   const [voteStatus, setVoteStatus] = useState('')
 
-  const handleAuthenticate = () => {
-    setAuthStatus('AI authentication integration pending.')
-    setVoteStatus('')
+  const handleAuthenticate = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/authenticate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voterId }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Authentication request failed.')
+      }
+
+      setAuthStatus(data.message || 'AI authentication integration pending.')
+      setVoteStatus('')
+    } catch (error) {
+      setAuthStatus(error.message || 'AI authentication integration pending.')
+      setVoteStatus('')
+    }
   }
 
-  const handleCastVote = (event) => {
+  const handleCastVote = async (event) => {
     event.preventDefault()
-    setVoteStatus('AI and backend integration are currently under development.')
+
+    try {
+      const response = await fetch('http://localhost:5000/api/votes/cast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          voterId,
+          candidate: selectedCandidate,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Vote request failed.')
+      }
+
+      setVoteStatus(data.message || 'Blockchain integration is pending.')
+    } catch (error) {
+      setVoteStatus(error.message || 'Blockchain integration is pending.')
+    }
   }
 
   return (

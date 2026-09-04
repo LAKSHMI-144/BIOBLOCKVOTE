@@ -20,9 +20,34 @@ function Register() {
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    setStatusMessage('Registration interface completed. Backend integration pending.')
+
+    try {
+      const response = await fetch('http://localhost:5000/api/voters/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          voterId: formData.voterId,
+          fullName: formData.name,
+          age: formData.age,
+          gender: formData.gender,
+          address: formData.address,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration request failed.')
+      }
+
+      setStatusMessage(data.message || 'Registration interface completed. Backend integration pending.')
+    } catch (error) {
+      setStatusMessage(error.message || 'Registration interface completed. Backend integration pending.')
+    }
   }
 
   return (
